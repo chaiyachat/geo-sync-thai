@@ -41,6 +41,8 @@ export type TrsStats = {
   topTargetAreas: { name: string; count: number }[];
   topTargetProvinces: { name: string; count: number }[];
   provinceList: string[];
+  /** Map of canonical Thai province name -> count of users targeting that province */
+  provinceCounts: Record<string, number>;
   fetchedAt: string;
 };
 
@@ -146,6 +148,7 @@ export const getTrsStats = createServerFn({ method: "GET" }).handler(async () =>
     topTargetAreas: topN(targetAreaCounts, 10),
     topTargetProvinces: topN(targetProvinceCounts, 10),
     provinceList: [...allProvinces].sort((a, b) => a.localeCompare(b, "th")),
+    provinceCounts: Object.fromEntries(targetProvinceCounts),
     fetchedAt: new Date().toISOString(),
   };
 
