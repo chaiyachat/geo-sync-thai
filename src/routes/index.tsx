@@ -3,6 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 
 import { getTrsStats } from "@/lib/trs.functions";
+import { ThailandMap } from "@/components/ThailandMap";
 
 const trsQueryOptions = queryOptions({
   queryKey: ["trs-stats"],
@@ -55,14 +56,14 @@ function TopList({
 }) {
   const max = Math.max(1, ...items.map((i) => i.count));
   return (
-    <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-5">
+    <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-5 h-full">
       <h3 className="mb-4 text-sm font-semibold text-cyan-300">{title}</h3>
       <ol className="space-y-2">
         {items.map((item, idx) => (
           <li key={item.name} className="flex items-center gap-3 text-sm">
             <span className="w-5 text-right text-slate-500 tabular-nums">{idx + 1}</span>
             <span className="flex-1 truncate text-slate-200" title={item.name}>{item.name}</span>
-            <div className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-slate-800 sm:block">
+            <div className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-slate-800 xl:block">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-violet-500"
                 style={{ width: `${(item.count / max) * 100}%` }}
@@ -113,11 +114,23 @@ function DashboardContent() {
         <StatCard label="จำนวนจังหวัด" value={data.provinces} accent="rgba(168,85,247,0.45)" />
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <TopList title="TOP 10 เขตที่ต้องการมากที่สุด" items={data.topTargetAreas} />
-        <TopList title="TOP 10 จังหวัดที่ต้องการมากที่สุด" items={data.topTargetProvinces} />
+      {/* 3-column layout: Map 40% | Top Areas 30% | Top Provinces 30% */}
+      <section className="grid gap-4 lg:grid-cols-10">
+        <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-5 lg:col-span-4">
+          <h3 className="mb-3 text-sm font-semibold text-cyan-300">
+            แผนที่ความต้องการย้ายตามภูมิภาค
+          </h3>
+          <ThailandMap provinceCounts={data.provinceCounts} />
+        </div>
+        <div className="lg:col-span-3">
+          <TopList title="TOP 10 เขตที่ต้องการมากที่สุด" items={data.topTargetAreas} />
+        </div>
+        <div className="lg:col-span-3">
+          <TopList title="TOP 10 จังหวัดที่ต้องการมากที่สุด" items={data.topTargetProvinces} />
+        </div>
       </section>
 
+      {/* Province tags moved to full-width footer row */}
       <section className="mt-6 rounded-lg border border-slate-800/80 bg-slate-950/60 p-5">
         <h3 className="mb-3 text-sm font-semibold text-cyan-300">
           รายชื่อจังหวัดที่ปรากฏในข้อมูล ({data.provinceList.length}/77)
@@ -129,13 +142,16 @@ function DashboardContent() {
               className="rounded-md border border-slate-700/60 bg-slate-900/80 px-2 py-1 text-xs text-slate-300"
             >
               {p}
+              {data.provinceCounts[p] ? (
+                <span className="ml-1 text-cyan-300 font-semibold">{data.provinceCounts[p]}</span>
+              ) : null}
             </span>
           ))}
         </div>
       </section>
 
       <footer className="mt-6 text-center text-xs text-slate-600">
-        นับจังหวัดอ้างอิงรายชื่อทางการของประเทศไทย 77 จังหวัด
+        นับจังหวัดอ้างอิงรายชื่อทางการของประเทศไทย 77 จังหวัด · ข้อมูลสดจาก Google Sheet
       </footer>
     </div>
   );
