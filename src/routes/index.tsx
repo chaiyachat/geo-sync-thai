@@ -107,11 +107,12 @@ function DashboardContent() {
         </span>
       </header>
 
-      <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+      <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
         <StatCard label="ผู้ลงทะเบียนทั้งหมด" value={data.total} accent="rgba(56,189,248,0.45)" />
         <StatCard label="เปิดใช้งาน (on)" value={data.active} accent="rgba(34,197,94,0.45)" />
         <StatCard label="วิชา (subjects)" value={data.subjects} accent="rgba(234,179,8,0.45)" />
         <StatCard label="จำนวนจังหวัด" value={data.provinces} accent="rgba(168,85,247,0.45)" />
+        <StatCard label="คู่จับคู่ครู (matches)" value={data.matches} accent="rgba(244,114,182,0.55)" />
       </section>
 
       {/* 3-column layout: Map 40% | Top Areas 30% | Top Provinces 30% */}
