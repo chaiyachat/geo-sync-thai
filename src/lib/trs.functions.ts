@@ -43,8 +43,19 @@ export type TrsStats = {
   provinceList: string[];
   /** Map of canonical Thai province name -> count of users targeting that province */
   provinceCounts: Record<string, number>;
+  /** Number of mutual teacher matches (A.area==B.target && B.area==A.target, same subject, different school) */
+  matches: number;
   fetchedAt: string;
 };
+
+// Normalize school name — treat "โรงเรียนX" and "X" as same school
+function normalizeSchool(raw: string): string {
+  return (raw || "")
+    .replace(/^โรงเรียน\s*/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
 
 // Strip "สพป./สพม." prefix, "เขต N", whitespace
 function normalizeArea(raw: string): string {
