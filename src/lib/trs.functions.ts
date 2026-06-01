@@ -145,6 +145,33 @@ export const getTrsStats = createServerFn({ method: "GET" }).handler(async () =>
     }
   }
 
+  // Compute mutual matches: A.area==B.target && B.area==A.target, same subject, different school
+  type Rec = { subject: string; area: string; target: string; school: string };
+  const recs: Rec[] = data
+    .map((r) => ({
+      subject: (r[3] || "").trim(),
+      area: normalizeArea((r[5] || "").trim()),
+      target: normalizeArea((r[6] || "").trim()),
+      school: normalizeSchool(r[4] || ""),
+    }))
+    .filter((x) => x.subject && x.area && x.target);
+
+  // Index by "subject||area||target" → list of schools
+  const idx = new Map<string, string[]>();
+  for (const x of recs) {
+    const k = `${x.subject}||${x.area}||${x.target}`;
+    const arr = idx.get(k);
+    if (arr) arr.push(x.school); else idx.set(k, [x.school]);
+  }
+  let matchPairs = 0;
+  for (const x of recs) {
+    const k = `${x.subject}||${x.target}||${x.area}`;
+    const others = idx.get(k);
+    if (!others) continue;
+    for (const s of others) if (s !== x.school) matchPairs++;
+  }
+  const matches = Math.floor(matchPairs / 2);
+
   const topN = (m: Map<string, number>, n: number) =>
     [...m.entries()]
       .map(([name, count]) => ({ name, count }))
@@ -160,6 +187,7 @@ export const getTrsStats = createServerFn({ method: "GET" }).handler(async () =>
     topTargetProvinces: topN(targetProvinceCounts, 10),
     provinceList: [...allProvinces].sort((a, b) => a.localeCompare(b, "th")),
     provinceCounts: Object.fromEntries(targetProvinceCounts),
+    matches,
     fetchedAt: new Date().toISOString(),
   };
 
