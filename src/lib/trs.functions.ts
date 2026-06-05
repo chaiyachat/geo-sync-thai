@@ -110,7 +110,11 @@ const TTL_MS = 5 * 60 * 1000;
 export const getTrsStats = createServerFn({ method: "GET" }).handler(async () => {
   if (cache && Date.now() - cache.at < TTL_MS) return cache.stats;
 
-  const res = await fetch(SHEET_URL, { headers: { "cache-control": "no-cache" } });
+  // bust Google's edge cache by appending a timestamp
+  const url = `${SHEET_URL}&_=${Date.now()}`;
+  const res = await fetch(url, {
+    headers: { "cache-control": "no-cache", pragma: "no-cache" },
+  });
   if (!res.ok) throw new Error(`Sheet fetch failed: ${res.status}`);
   const csv = await res.text();
   const rows = parseCSV(csv);
