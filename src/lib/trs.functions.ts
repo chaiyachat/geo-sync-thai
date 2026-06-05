@@ -2,7 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 
 const SHEET_ID = "1c-mNHXcBNRZcDjsVkE9adSByAptdMkrxHMHIkFIFFt4";
 const GID = "502215408";
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
+// Use /export — gviz/tq truncates sheets that use ARRAYFORMULA (returns only ~274 rows)
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
 
 // Canonical 77 Thai provinces (official)
 const THAI_PROVINCES = [
